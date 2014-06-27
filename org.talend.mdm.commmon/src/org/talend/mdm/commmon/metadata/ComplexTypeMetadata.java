@@ -1,12 +1,11 @@
 /*
  * Copyright (C) 2006-2013 Talend Inc. - www.talend.com
- *
+ * 
  * This source code is available under agreement available at
  * %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
- *
- * You should have received a copy of the agreement
- * along with this program; if not, write to Talend SA
- * 9 rue Pages 92150 Suresnes, France
+ * 
+ * You should have received a copy of the agreement along with this program; if not, write to Talend SA 9 rue Pages
+ * 92150 Suresnes, France
  */
 
 package org.talend.mdm.commmon.metadata;
@@ -27,7 +26,7 @@ public interface ComplexTypeMetadata extends TypeMetadata {
 
     /**
      * @return A {@link List} of {@link FieldMetadata} that represents key information for the complex type. This method
-     *         might return an empty list if no key field is defined for this type.
+     * might return an empty list if no key field is defined for this type.
      * @see #registerKey(FieldMetadata)
      */
     Collection<FieldMetadata> getKeyFields();
@@ -41,28 +40,31 @@ public interface ComplexTypeMetadata extends TypeMetadata {
     /**
      * Retrieves a {@link FieldMetadata} based on name. Name might either be a field name or a '/'-separated path (like
      * 'Family/FamilyId'.
+     * 
      * @param fieldName A field name. Field name is case sensitive and implementations supports path syntax.
      * @return The {@link FieldMetadata} for the given <code>fieldName</code>.
-     * @throws IllegalArgumentException If:<ul>
-     *                                  <li>field is not declared in type nor inherited types</li>
-     *                                  <li><code>fieldName</code> is null or empty string</li>
-     *                                  </ul>
-     *                                  Field name lookup is case sensitive.
+     * @throws IllegalArgumentException If:
+     * <ul>
+     * <li>field is not declared in type nor inherited types</li>
+     * <li><code>fieldName</code> is null or empty string</li>
+     * </ul>
+     * Field name lookup is case sensitive.
      * @see #hasField(String)
      */
     FieldMetadata getField(String fieldName);
 
     /**
-     * Returns a <b>READ ONLY</b> collection of fields. For adding super type see {@link ComplexTypeMetadata#addField(FieldMetadata)}.
-     *
+     * Returns a <b>READ ONLY</b> collection of fields. For adding super type see
+     * {@link ComplexTypeMetadata#addField(FieldMetadata)}.
+     * 
      * @return A collection of super types.
      */
     Collection<FieldMetadata> getFields();
 
     /**
-     * Adds a new field to this type. Please note that if {@link org.talend.mdm.commmon.metadata.FieldMetadata#isKey()} returns
-     * <code>true</code>, there's no need to call {@link #registerKey(FieldMetadata)}.
-     *
+     * Adds a new field to this type. Please note that if {@link org.talend.mdm.commmon.metadata.FieldMetadata#isKey()}
+     * returns <code>true</code>, there's no need to call {@link #registerKey(FieldMetadata)}.
+     * 
      * @param fieldMetadata A new field to add to this type.
      * @throws IllegalArgumentException If <code>fieldMetadata</code> is <code>null</code> or is type is frozen.
      * @see TypeMetadata#freeze()
@@ -89,7 +91,7 @@ public interface ComplexTypeMetadata extends TypeMetadata {
      * @return The {@link List} of users that can't delete an instance of this type.
      */
     List<String> getDenyDelete(DeleteType type);
-    
+
     /**
      * @return The {@link List} of workflow roles (including writable, read-only and hidden roles. format: role
      * name#processId+processVersion#access rights).
@@ -98,7 +100,7 @@ public interface ComplexTypeMetadata extends TypeMetadata {
 
     /**
      * @return Schematron validation rules for this type ready for immediate use (no need to un-escape XML characters).
-     *         Returns an empty string if no schematron rule was specified for this type.
+     * Returns an empty string if no schematron rule was specified for this type.
      */
     String getSchematron();
 
@@ -110,16 +112,17 @@ public interface ComplexTypeMetadata extends TypeMetadata {
     /**
      * Tests if a {@link FieldMetadata} exists for given name. Name might either be a field name or a '/'-separated path
      * (like 'Family/FamilyId').
+     * 
      * @param fieldName A field name. Field name is case sensitive and implementations supports path syntax.
      * @return <code>true</code> if type (or inherited types) has a field named <code>fieldName</code>,
-     *         <code>false</code> otherwise.
+     * <code>false</code> otherwise.
      * @see #getField(String)
      */
     boolean hasField(String fieldName);
 
     /**
-     * @return A collection of {@link ComplexTypeMetadata} that inherits from this type. If this type is not extended
-     *         by any other type, this method returns empty {@link Collection}.
+     * @return A collection of {@link ComplexTypeMetadata} that inherits from this type. If this type is not extended by
+     * any other type, this method returns empty {@link Collection}.
      */
     Collection<ComplexTypeMetadata> getSubTypes();
 
@@ -130,9 +133,9 @@ public interface ComplexTypeMetadata extends TypeMetadata {
 
     List<FieldMetadata> getLookupFields();
 
-    void declareUsage(ContainedComplexTypeMetadata usage);
+    void declareUsage(ComplexTypeMetadata usage);
 
-    void freezeUsages();
+    Collection<ComplexTypeMetadata> getUsages();
 
     void setSubTypes(List<ComplexTypeMetadata> subTypes);
 

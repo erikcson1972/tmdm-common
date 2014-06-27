@@ -39,51 +39,27 @@ public class LookupFieldProcessor implements XmlSchemaAnnotationProcessor {
         }
     }
 
-    private FieldMetadata handleLookupField(MetadataRepository repository, XmlSchemaAnnotationProcessorState state, Element appInfo) {
+    private FieldMetadata handleLookupField(MetadataRepository repository, XmlSchemaAnnotationProcessorState state,
+            Element appInfo) {
         state.markAsReference();
         String path = appInfo.getTextContent();
-        String[] typeAndFields = path.split("/"); //$NON-NLS-1$
-        String userNamespace = repository.getUserNamespace();
-        state.setFieldType(new SoftTypeRef(repository, userNamespace, typeAndFields[0].trim(), true));
-        state.setReferencedType(new SoftTypeRef(repository, userNamespace, typeAndFields[0].trim(), true)); // Only reference instantiable types.
-        List<String> fieldList = Arrays.asList(typeAndFields);
-        FieldMetadata fieldMetadata = createFieldReference(repository, state.getFieldType(), fieldList, appInfo);
+        FieldMetadata fieldMetadata = getFieldMetadata(repository, state, appInfo, path);
         if (fieldMetadata == null) {
             throw new IllegalArgumentException("Path '" + path + "' is not supported.");
         }
         return fieldMetadata;
     }
 
-    private static FieldMetadata createFieldReference(MetadataRepository repository, TypeMetadata rootTypeName, List<String> path, Element appInfo) {
-        Queue<String> processQueue = new LinkedList<String>(path);
-        processQueue.poll(); // Remove first (first is type name and required additional processing for '.')
-        SoftTypeRef currentType = new SoftTypeRef(repository, rootTypeName.getNamespace(), rootTypeName.getName(), true);
-        FieldMetadata fieldMetadata;
-        if (processQueue.isEmpty()) {
-            // handle case where referenced type "Type" only and not "Type/Id" (way to reference composite id).
-            fieldMetadata = new SoftIdFieldRef(repository, rootTypeName.getName());
-        } else {
-            SoftFieldRef previous = null;
-            SoftFieldRef newField = null;
-            while (!processQueue.isEmpty()) {
-                // In case of "PersonneMorale/IdPersonneMorale[PersonneMorale/ListeRole/Role/IdRole=DEP]", skip xpath condition.
-                String currentField = processQueue.poll().trim();
-                if (currentField.indexOf('[') > 0) {
-                    currentField = StringUtils.substringBefore(currentField, "["); //$NON-NLS-1$
-                    processQueue.clear(); // don't process any further the xpath expression.
-                }
-                if (previous == null) {
-                    newField = new SoftFieldRef(repository, currentField, currentType);
-                } else {
-                    newField = new SoftFieldRef(repository, currentField, previous);
-                }
-                previous = newField;
-            }
-            fieldMetadata = newField;
-        }
-        if (fieldMetadata == null) {
-            throw new IllegalStateException();
-        }
+    // TODO Common code with ForeignKeyProcessor!
+    private static FieldMetadata getFieldMetadata(MetadataRepository repository, XmlSchemaAnnotationProcessorState state,
+            Element appInfo, String path) {
+        String typeName = StringUtils.substringBefore(path, "/").trim(); //$NON-NLS-1$
+        String fieldPath = StringUtils.substringAfter(path, "/").trim(); //$NON-NLS-1$
+        String userNamespace = repository.getUserNamespace();
+        SoftTypeRef referencedType = new SoftTypeRef(repository, userNamespace, typeName, true);
+        state.setFieldType(referencedType); // TODO Wrong!!!!
+        state.setReferencedType(referencedType); // Only reference instantiable types.
+        FieldMetadata fieldMetadata = new SoftFieldRef(repository, fieldPath, typeName);
         fieldMetadata.setData(MetadataRepository.XSD_LINE_NUMBER, XSDParser.getStartLine(appInfo));
         fieldMetadata.setData(MetadataRepository.XSD_COLUMN_NUMBER, XSDParser.getStartColumn(appInfo));
         fieldMetadata.setData(MetadataRepository.XSD_DOM_ELEMENT, appInfo);

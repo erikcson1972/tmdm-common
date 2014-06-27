@@ -121,29 +121,44 @@ public class ConsoleDumpMetadataVisitor extends DefaultMetadataVisitor<Void> {
             log("[Field (Simple) -> " + simpleField.getType().getName() + "] " + simpleField.getName() + (simpleField.isMany() ? "*" : "")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
         logUsers(simpleField);
-        log("\t[Full path:" + simpleField.getEntityTypeName() + "/" + simpleField.getPath() + "]");
+        log("\t[Full path: " + simpleField.getEntityTypeName() + "/" + simpleField.getPath() + "]");
         return null;
     }
 
     public Void visit(EnumerationFieldMetadata enumField) {
         log("[Field (Enumeration) -> " + enumField.getType().getName() + "] " + enumField.getName()); //$NON-NLS-1$ //$NON-NLS-2$
         logUsers(enumField);
-        log("\t[Full path:" + enumField.getEntityTypeName() + "/" + enumField.getPath() + "]");
+        log("\t[Full path: " + enumField.getEntityTypeName() + "/" + enumField.getPath() + "]");
         return null;
     }
 
     @Override
     public Void visit(ContainedTypeFieldMetadata containedField) {
-        log("[Field (Contained type) -> " + containedField.getContainedType().getName() + "] " + containedField.getName() + (containedField.isMany() ? "*" : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        ComplexTypeMetadata containedType = containedField.getContainedType();
+        log("[Field (Contained type) -> " + containedType.getName() + "] " + containedField.getName() + (containedField.isMany() ? "*" : ""));  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         logUsers(containedField);
-        log("\t[Full path:" + containedField.getEntityTypeName() + "/" + containedField.getPath() + "]");
+        log("\t[Full path: " + containedField.getEntityTypeName() + "/" + containedField.getPath() + "]");
         indent++;
         {
-            containedField.getContainedType().accept(this);
+            containedType.accept(this);
+            if (!containedType.getSubTypes().isEmpty()) {
+                log("[Sub Types]");
+                indent++;
+                for (ComplexTypeMetadata subType : containedType.getSubTypes()) {
+                    subType.accept(this);
+                }
+                indent--;
+            }
         }
         indent--;
 
         return null;
+    }
+
+    @Override
+    public Void visit(ContainedComplexTypeMetadata containedType) {
+        log("\tResolved: " + containedType.isHasFrozenUsages());
+        return visit((ComplexTypeMetadata) containedType);
     }
 
     private void logUsers(FieldMetadata metadata) {

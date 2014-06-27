@@ -38,7 +38,7 @@ public class SoftTypeRef implements ComplexTypeMetadata {
 
     private TypeMetadata frozenType;
 
-    private List<ContainedComplexTypeMetadata> usages = new ArrayList<ContainedComplexTypeMetadata>();
+    private final List<ComplexTypeMetadata> usages = new ArrayList<ComplexTypeMetadata>();
 
     private SoftTypeRef(MetadataRepository repository, FieldMetadata fieldRef) {
         if (fieldRef == null) {
@@ -160,6 +160,11 @@ public class SoftTypeRef implements ComplexTypeMetadata {
             Set<Map.Entry<String, Object>> data = additionalData.entrySet();
             for (Map.Entry<String, Object> currentData : data) {
                 frozenType.setData(currentData.getKey(), currentData.getValue());
+            }
+            if (frozenType instanceof ComplexTypeMetadata) {
+                for (ComplexTypeMetadata usage : usages) {
+                    ((ComplexTypeMetadata) frozenType).declareUsage(usage);
+                }
             }
         }
         return frozenType;
@@ -312,13 +317,13 @@ public class SoftTypeRef implements ComplexTypeMetadata {
     }
 
     @Override
-    public void declareUsage(ContainedComplexTypeMetadata usage) {
+    public void declareUsage(ComplexTypeMetadata usage) {
         usages.add(usage);
     }
 
     @Override
-    public void freezeUsages() {
-        throw new IllegalStateException("Usage freeze must be called on resolved type references.");
+    public Collection<ComplexTypeMetadata> getUsages() {
+        return usages;
     }
 
     @Override

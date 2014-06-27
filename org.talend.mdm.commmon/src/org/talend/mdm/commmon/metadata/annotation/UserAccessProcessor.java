@@ -24,19 +24,21 @@ public class UserAccessProcessor implements XmlSchemaAnnotationProcessor {
         if (annotation != null) {
             EList<Element> appInfoElements = annotation.getApplicationInformation();
             for (Element appInfo : appInfoElements) {
-                if ("X_Hide".equals(appInfo.getAttribute("source"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    state.getHide().add(appInfo.getTextContent());
-                } else if ("X_Write".equals(appInfo.getAttribute("source"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    state.getAllowWrite().add(appInfo.getTextContent());
-                } else if ("X_Deny_Create".equals(appInfo.getAttribute("source"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    state.getDenyCreate().add(appInfo.getTextContent());
-                } else if ("X_Deny_LogicalDelete".equals(appInfo.getAttribute("source"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    state.getDenyLogicalDelete().add(appInfo.getTextContent());
-                } else if ("X_Deny_PhysicalDelete".equals(appInfo.getAttribute("source"))) { //$NON-NLS-1$ //$NON-NLS-2$
-                    state.getDenyPhysicalDelete().add(appInfo.getTextContent());
-                } else if ("X_Workflow".equals(appInfo.getAttribute("source"))) {  //$NON-NLS-1$//$NON-NLS-2$
+                String source = appInfo.getAttribute("source");
+                String textContent = appInfo.getTextContent();
+                if ("X_Hide".equals(source)) { //$NON-NLS-1$ //$NON-NLS-2$
+                    state.getHide().add(textContent);
+                } else if ("X_Write".equals(source)) { //$NON-NLS-1$ //$NON-NLS-2$
+                    state.getAllowWrite().add(textContent);
+                } else if ("X_Deny_Create".equals(source)) { //$NON-NLS-1$ //$NON-NLS-2$
+                    state.getDenyCreate().add(textContent);
+                } else if ("X_Deny_LogicalDelete".equals(source)) { //$NON-NLS-1$ //$NON-NLS-2$
+                    state.getDenyLogicalDelete().add(textContent);
+                } else if ("X_Deny_PhysicalDelete".equals(source)) { //$NON-NLS-1$ //$NON-NLS-2$
+                    state.getDenyPhysicalDelete().add(textContent);
+                } else if ("X_Workflow".equals(source)) {  //$NON-NLS-1$//$NON-NLS-2$
                     // including Writable, Read-only and Hidden
-                    state.getWorkflowAccessRights().add(appInfo.getTextContent());
+                    state.getWorkflowAccessRights().add(textContent);
                 }
             }
         }

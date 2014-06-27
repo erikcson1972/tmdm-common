@@ -17,7 +17,7 @@ import org.eclipse.xsd.XSDSchema;
 import org.eclipse.xsd.XSDSimpleTypeDefinition;
 
 /**
- *
+ * A visitor for a parsed XML schema.
  */
 public interface XSDVisitor {
 

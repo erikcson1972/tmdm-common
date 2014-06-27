@@ -17,7 +17,7 @@ import org.eclipse.xsd.*;
 import javax.xml.XMLConstants;
 
 /**
- *
+ * A 'walker' for the parsed XML schema (calls the right methods on {@link org.talend.mdm.commmon.metadata.xsd.XSDVisitor visitor}.
  */
 public class XmlSchemaWalker {
 

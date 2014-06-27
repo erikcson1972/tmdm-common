@@ -24,27 +24,17 @@ public class SoftFieldRef implements FieldMetadata {
 
     private final MetadataRepository repository;
 
-    private final SoftFieldRef containingField;
-
-    private final TypeMetadata containingType;
+    private final String containingTypeName;
 
     private final String fieldName;
 
     private final Map<String, Object> additionalData = new HashMap<String, Object>();
 
-    private FieldMetadata frozenField;
+    private final Map<Locale, String> localeToLabel = new HashMap<Locale, String>();
 
-    public SoftFieldRef(MetadataRepository metadataRepository, String fieldName, TypeMetadata containingType) {
+    public SoftFieldRef(MetadataRepository metadataRepository, String fieldName, String containingTypeName) {
         this.repository = metadataRepository;
-        this.containingType = containingType;
-        this.fieldName = fieldName;
-        this.containingField = null;
-    }
-
-    public SoftFieldRef(MetadataRepository metadataRepository, String fieldName, SoftFieldRef containingField) {
-        this.repository = metadataRepository;
-        this.containingField = containingField;
-        this.containingType = null;
+        this.containingTypeName = containingTypeName;
         this.fieldName = fieldName;
     }
 
@@ -79,7 +69,7 @@ public class SoftFieldRef implements FieldMetadata {
 
     @Override
     public ComplexTypeMetadata getContainingType() {
-        return (ComplexTypeMetadata) containingType;
+        return new SoftTypeRef(repository, repository.getUserNamespace(), containingTypeName, true);
     }
 
     @Override
@@ -89,36 +79,14 @@ public class SoftFieldRef implements FieldMetadata {
 
     @Override
     public FieldMetadata freeze() {
-        if (frozenField != null) {
-            return frozenField;
-        }
-        ComplexTypeMetadata type = null;
-        if (containingType != null) {
-            type = repository.getComplexType(containingType.getName());
-            if (type == null) {
-                TypeMetadata freeze = containingType.freeze();
-                frozenField = new UnresolvedFieldMetadata(fieldName,
-                        true,
-                        (ComplexTypeMetadata) freeze);
-            }
+        ComplexTypeMetadata type = repository.getComplexType(containingTypeName);
+        FieldMetadata frozenField;
+        if (type == null) {
+            frozenField = new UnresolvedFieldMetadata(fieldName, false, new UnresolvedTypeMetadata(containingTypeName));
+        } else if (!type.hasField(fieldName)) {
+            frozenField = new UnresolvedFieldMetadata(fieldName, false, type);
         } else {
-            FieldMetadata frozenContainingField = containingField.freeze();
-            if (frozenContainingField instanceof UnresolvedFieldMetadata) {
-                frozenField = new UnresolvedFieldMetadata(fieldName,
-                        true,
-                        (ComplexTypeMetadata) containingField.getContainingType().freeze());
-            } else {
-                type = (ComplexTypeMetadata) containingField.getType();
-            }
-        }
-        if (type != null) {
-            if (!type.hasField(fieldName)) {
-                frozenField = new UnresolvedFieldMetadata(fieldName,
-                        true,
-                        type);
-            } else {
-                frozenField = type.getField(fieldName).copy().freeze();
-            }
+            frozenField = type.getField(fieldName).freeze().copy();
         }
         // Add additional data (line number...).
         Set<Map.Entry<String,Object>> data = additionalData.entrySet();
@@ -139,46 +107,15 @@ public class SoftFieldRef implements FieldMetadata {
         Integer lineNumberObject = (Integer) additionalData.get(MetadataRepository.XSD_LINE_NUMBER);
         Integer columnNumberObject = (Integer) additionalData.get(MetadataRepository.XSD_COLUMN_NUMBER);
         Element xmlElement = (Element) additionalData.get(MetadataRepository.XSD_DOM_ELEMENT);
-
-        TypeMetadata validationType;
-        if (containingType != null) {
-            validationType = containingType;
-        } else {
-            int errorCount = handler.getErrorCount();
-            containingField.validate(new LocationOverride(containingField, handler, xmlElement, lineNumberObject, columnNumberObject));
-            if (handler.getErrorCount() > errorCount) {
-                return;
-            }
-            validationType = containingField.getType();
-        }
-        if (lineNumberObject == null) {
-            lineNumberObject = validationType.<Integer>getData(MetadataRepository.XSD_LINE_NUMBER);
-        }
         if (columnNumberObject == null) {
-            columnNumberObject = validationType.<Integer>getData(MetadataRepository.XSD_COLUMN_NUMBER);
+            columnNumberObject = -1;
         }
         if (lineNumberObject == null) {
             lineNumberObject = -1;
         }
-        if (columnNumberObject == null) {
-            columnNumberObject = -1;
-        }
-        if (fieldName != null) {
-            ComplexTypeMetadata complexTypeMetadata = (ComplexTypeMetadata) validationType;
-            int errorCount = handler.getErrorCount();
-            complexTypeMetadata.validate(handler);
-            if (handler.getErrorCount() > errorCount) {
-                return;
-            }
-            if (!complexTypeMetadata.hasField(fieldName)) {
-                handler.error(this,
-                        "Type '" + validationType.getName() + "' does not own field '" + fieldName + "'.",
-                        xmlElement,
-                        lineNumberObject,
-                        columnNumberObject,
-                        ValidationError.TYPE_DOES_NOT_OWN_FIELD);
-            }
-        }
+        // References should no longer exist (all should be frozen at this point).
+        handler.error(this, "Field reference should no longer exist in model", xmlElement, lineNumberObject, columnNumberObject,
+                ValidationError.UNCAUGHT_ERROR);
     }
 
     @Override
@@ -210,7 +147,7 @@ public class SoftFieldRef implements FieldMetadata {
 
     @Override
     public FieldMetadata copy() {
-        return this;
+        return new SoftFieldRef(repository, fieldName, containingTypeName);
     }
 
     @Override
@@ -245,11 +182,7 @@ public class SoftFieldRef implements FieldMetadata {
 
     @Override
     public String toString() {
-        if (containingType != null) {
-            return containingType.toString() + "/" + fieldName; //$NON-NLS-1$
-        } else {
-            return containingField.toString() + "/" + fieldName; //$NON-NLS-1$
-        }
+        return getContainingType().toString() + "/" + fieldName; //$NON-NLS-1$
     }
 
     @Override

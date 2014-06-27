@@ -65,35 +65,6 @@ public class ReferenceFieldMetadata extends MetadataExtensions implements FieldM
                                   boolean allowFKIntegrityOverride,
                                   TypeMetadata fieldType,
                                   List<String> allowWriteUsers,
-                                  List<String> hideUsers) {
-        this(containingType,
-                isKey,
-                isMany,
-                isMandatory,
-                name,
-                referencedType,
-                referencedField,
-                foreignKeyInfo,
-                fkIntegrity,
-                allowFKIntegrityOverride,
-                fieldType,
-                allowWriteUsers,
-                hideUsers,
-                Collections.<String>emptyList());
-    }
-
-    public ReferenceFieldMetadata(ComplexTypeMetadata containingType,
-                                  boolean isKey,
-                                  boolean isMany,
-                                  boolean isMandatory,
-                                  String name,
-                                  ComplexTypeMetadata referencedType,
-                                  FieldMetadata referencedField,
-                                  List<FieldMetadata> foreignKeyInfo,
-                                  boolean fkIntegrity,
-                                  boolean allowFKIntegrityOverride,
-                                  TypeMetadata fieldType,
-                                  List<String> allowWriteUsers,
                                   List<String> hideUsers,
                                   List<String> workflowAccessRights) {
         this.isMandatory = isMandatory;
@@ -230,7 +201,6 @@ public class ReferenceFieldMetadata extends MetadataExtensions implements FieldM
     }
 
     public FieldMetadata copy() {
-        ComplexTypeMetadata referencedTypeCopy = referencedType;
         FieldMetadata referencedFieldCopy = referencedField.copy();
         List<FieldMetadata> foreignKeyInfoCopy;
         if (hasForeignKeyInfo()) {
@@ -241,13 +211,12 @@ public class ReferenceFieldMetadata extends MetadataExtensions implements FieldM
         } else {
             foreignKeyInfoCopy = Collections.emptyList();
         }
-        ComplexTypeMetadata containingTypeCopy = (ComplexTypeMetadata) containingType.copyShallow();
-        return new ReferenceFieldMetadata(containingTypeCopy,
+        ReferenceFieldMetadata copy = new ReferenceFieldMetadata(containingType,
                 isKey,
                 isMany,
                 isMandatory,
                 name,
-                referencedTypeCopy,
+                referencedType,
                 referencedFieldCopy,
                 foreignKeyInfoCopy,
                 isFKIntegrity,
@@ -256,6 +225,10 @@ public class ReferenceFieldMetadata extends MetadataExtensions implements FieldM
                 writeUsers,
                 hideUsers,
                 workflowAccessRights);
+        if (dataMap != null) {
+            copy.dataMap = new HashMap<String, Object>(dataMap);
+        }
+        return copy;
     }
 
     @Override

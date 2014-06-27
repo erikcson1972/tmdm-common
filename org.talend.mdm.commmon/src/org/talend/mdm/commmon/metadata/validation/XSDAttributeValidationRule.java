@@ -1,15 +1,29 @@
 /*
+<<<<<<< HEAD:org.talend.mdm.commmon/src/org/talend/mdm/commmon/metadata/validation/XSDAttributeValidationRule.java
  * Copyright (C) 2006-2013 Talend Inc. - www.talend.com
  *
+=======
+ * Copyright (C) 2006-2014 Talend Inc. - www.talend.com
+ * 
+>>>>>>> e100b9c... TMDM-7482: "view contains complex type fields throw error in webUI":main/plugins/org.talend.mdm.commmon/src/org/talend/mdm/commmon/metadata/validation/XSDAttributeValidationRule.java
  * This source code is available under agreement available at
  * %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
- *
- * You should have received a copy of the agreement
- * along with this program; if not, write to Talend SA
- * 9 rue Pages 92150 Suresnes, France
+ * 
+ * You should have received a copy of the agreement along with this program; if not, write to Talend SA 9 rue Pages
+ * 92150 Suresnes, France
  */
 
 package org.talend.mdm.commmon.metadata.validation;
+
+import java.util.Collections;
+import java.util.Iterator;
+
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
 import org.eclipse.xsd.util.XSDParser;
@@ -20,18 +34,13 @@ import org.talend.mdm.commmon.metadata.ValidationHandler;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.util.Collections;
-import java.util.Iterator;
+/**
+ * MDM does not take into account &lt;xsd:attribute&gt; declarations in the XSD (only elements are parsed). This warning indicates
+ * this to the user.
+ */
+class XSDAttributeValidationRule implements ValidationRule {
 
-public class XSDAttributeValidationRule implements ValidationRule {
-
-    protected static final Logger LOGGER = Logger.getLogger(XSDAttributeValidationRule.class);
+    private static final Logger LOGGER = Logger.getLogger(XSDAttributeValidationRule.class);
 
     private final ComplexTypeMetadata type;
 
@@ -41,6 +50,7 @@ public class XSDAttributeValidationRule implements ValidationRule {
         this.type = type;
         xPath = XPathFactory.newInstance().newXPath();
         xPath.setNamespaceContext(new NamespaceContext() {
+
             @Override
             public String getNamespaceURI(String prefix) {
                 if ("xsd".equals(prefix)) { //$NON-NLS-1$
@@ -67,28 +77,22 @@ public class XSDAttributeValidationRule implements ValidationRule {
         if (element == null) {
             return true; // No need to check anything if no DOM element
         }
-        Integer lineNumber = type.<Integer>getData(MetadataRepository.XSD_LINE_NUMBER);
-        Integer columnNumber = type.<Integer>getData(MetadataRepository.XSD_COLUMN_NUMBER);
+        Integer lineNumber = type.<Integer> getData(MetadataRepository.XSD_LINE_NUMBER);
+        Integer columnNumber = type.<Integer> getData(MetadataRepository.XSD_COLUMN_NUMBER);
         try {
             NodeList nodeSet = (NodeList) xPath.evaluate("//xsd:attribute", element, XPathConstants.NODESET); //$NON-NLS-1$
             for (int i = 0; i < nodeSet.getLength(); i++) {
-                handler.warning(type,
-                        "Entity type '" + type.getName() + "' uses XSD attribute but attributes are ignored by MDM.",
-                        (Element) nodeSet.item(i),
-                        XSDParser.getStartLine(nodeSet.item(i)),
-                        XSDParser.getStartColumn(nodeSet.item(i)),
+                handler.warning(type, "Entity type '" + type.getName()
+                        + "' uses XSD attribute but attributes are ignored by MDM.", (Element) nodeSet.item(i),
+                        XSDParser.getStartLine(nodeSet.item(i)), XSDParser.getStartColumn(nodeSet.item(i)),
                         ValidationError.TYPE_USE_XSD_ATTRIBUTES);
             }
             return nodeSet.getLength() == 0;
         } catch (XPathExpressionException e) {
             // Never stop the validation, but logs the exception anyway.
             LOGGER.error("Unexpected exception during XSD attributes check", e);
-            handler.error(type,
-                    "Could not check type '" + type.getName() + "' for XSD attributes",
-                    element,
-                    lineNumber,
-                    columnNumber,
-                    ValidationError.UNCAUGHT_ERROR);
+            handler.error(type, "Could not check type '" + type.getName() + "' for XSD attributes", element, lineNumber,
+                    columnNumber, ValidationError.UNCAUGHT_ERROR);
             return false;
         }
     }

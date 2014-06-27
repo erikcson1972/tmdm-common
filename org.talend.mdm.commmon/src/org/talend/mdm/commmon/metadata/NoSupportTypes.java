@@ -30,7 +30,7 @@ public enum NoSupportTypes {
     G_DAY("gDay"), //$NON-NLS-1$
     G_MONTH("gMonth"); //$NON-NLS-1$
 
-    private String type;
+    private final String type;
 
     NoSupportTypes(String type) {
         this.type = type;

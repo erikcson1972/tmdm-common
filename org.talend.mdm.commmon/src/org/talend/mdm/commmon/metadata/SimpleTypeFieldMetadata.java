@@ -14,6 +14,7 @@ package org.talend.mdm.commmon.metadata;
 import org.talend.mdm.commmon.metadata.validation.ValidationFactory;
 import org.talend.mdm.commmon.metadata.validation.ValidationRule;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -46,14 +47,14 @@ public class SimpleTypeFieldMetadata extends MetadataExtensions implements Field
     private int cachedHashCode;
 
     public SimpleTypeFieldMetadata(ComplexTypeMetadata containingType,
-                                   boolean isKey,
-                                   boolean isMany,
-                                   boolean isMandatory,
-                                   String name,
-                                   TypeMetadata fieldType,
-                                   List<String> allowWriteUsers,
-                                   List<String> hideUsers,
-                                   List<String> workflowAccessRights) {
+            boolean isKey,
+            boolean isMany,
+            boolean isMandatory,
+            String name,
+            TypeMetadata fieldType,
+            List<String> allowWriteUsers,
+            List<String> hideUsers,
+            List<String> workflowAccessRights) {
         if (fieldType == null) {
             throw new IllegalArgumentException("Field type cannot be null.");
         }
@@ -154,6 +155,9 @@ public class SimpleTypeFieldMetadata extends MetadataExtensions implements Field
                 hideUsers,
                 workflowAccessRights);
         copy.setDeclaringType(declaringType);
+        if (dataMap != null) {
+            copy.dataMap = new HashMap<String, Object>(dataMap);
+        }
         return copy;
     }
 

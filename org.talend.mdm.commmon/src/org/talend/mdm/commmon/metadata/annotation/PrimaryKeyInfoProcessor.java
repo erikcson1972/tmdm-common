@@ -46,7 +46,7 @@ public class PrimaryKeyInfoProcessor implements XmlSchemaAnnotationProcessor {
         String path = appInfo.getTextContent();
         String typeName = StringUtils.substringBefore(path, "/").trim(); //$NON-NLS-1$
         String fieldName = StringUtils.substringAfter(path, "/").trim(); //$NON-NLS-1$
-        SoftFieldRef field = new SoftFieldRef(repository, fieldName, new SoftTypeRef(repository, repository.getUserNamespace(), typeName, true));
+        SoftFieldRef field = new SoftFieldRef(repository, fieldName, typeName);
         field.setData(MetadataRepository.XSD_LINE_NUMBER, XSDParser.getStartLine(appInfo));
         field.setData(MetadataRepository.XSD_COLUMN_NUMBER, XSDParser.getStartColumn(appInfo));
         field.setData(MetadataRepository.XSD_DOM_ELEMENT, appInfo);

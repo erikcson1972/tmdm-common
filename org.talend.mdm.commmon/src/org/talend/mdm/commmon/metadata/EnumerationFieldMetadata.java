@@ -31,7 +31,7 @@ public class EnumerationFieldMetadata extends MetadataExtensions implements Fiel
 
     private final List<String> workflowAccessRights;
 
-    private TypeMetadata declaringType;
+    private final TypeMetadata declaringType;
 
     private final boolean isMany;
 
@@ -39,19 +39,19 @@ public class EnumerationFieldMetadata extends MetadataExtensions implements Fiel
 
     private ComplexTypeMetadata containingType;
 
-    private String name;
+    private final String name;
 
     private boolean isFrozen;
 
     private int cachedHashCode;
 
     public EnumerationFieldMetadata(ComplexTypeMetadata containingType,
-                                    boolean isKey,
-                                    boolean isMany, boolean isMandatory, String name,
-                                    TypeMetadata fieldType,
-                                    List<String> allowWriteUsers,
-                                    List<String> hideUsers,
-                                    List<String> workflowAccessRights) {
+            boolean isKey,
+            boolean isMany, boolean isMandatory, String name,
+            TypeMetadata fieldType,
+            List<String> allowWriteUsers,
+            List<String> hideUsers,
+            List<String> workflowAccessRights) {
         this.containingType = containingType;
         this.declaringType = containingType;
         this.isKey = isKey;

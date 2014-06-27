@@ -1,21 +1,28 @@
 /*
+<<<<<<< HEAD:org.talend.mdm.commmon/src/org/talend/mdm/commmon/metadata/validation/ForeignKeyShouldPointToID.java
  * Copyright (C) 2006-2013 Talend Inc. - www.talend.com
  *
+=======
+ * Copyright (C) 2006-2014 Talend Inc. - www.talend.com
+ * 
+>>>>>>> e100b9c... TMDM-7482: "view contains complex type fields throw error in webUI":main/plugins/org.talend.mdm.commmon/src/org/talend/mdm/commmon/metadata/validation/ForeignKeyShouldPointToID.java
  * This source code is available under agreement available at
  * %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
- *
- * You should have received a copy of the agreement
- * along with this program; if not, write to Talend SA
- * 9 rue Pages 92150 Suresnes, France
+ * 
+ * You should have received a copy of the agreement along with this program; if not, write to Talend SA 9 rue Pages
+ * 92150 Suresnes, France
  */
 
 package org.talend.mdm.commmon.metadata.validation;
 
+import java.util.Iterator;
+
 import org.talend.mdm.commmon.metadata.*;
 import org.w3c.dom.Element;
 
-import java.util.Iterator;
-
+/**
+ * Ensure a foreign key points to a key field (can't point to another element in referenced type).
+ */
 class ForeignKeyShouldPointToID implements ValidationRule {
 
     private final ReferenceFieldMetadata field;
@@ -38,11 +45,10 @@ class ForeignKeyShouldPointToID implements ValidationRule {
                 }
             }
             // Reports error
-            handler.warning(field,
-                    "Foreign key should point to a primary key (recommended choices are: " + referencedTypePK + ")",
-                    field.<Element>getData(MetadataRepository.XSD_DOM_ELEMENT),
-                    field.<Integer>getData(MetadataRepository.XSD_LINE_NUMBER),
-                    field.<Integer>getData(MetadataRepository.XSD_COLUMN_NUMBER),
+            handler.warning(field, "Foreign key should point to a primary key (recommended choices are: " + referencedTypePK
+                    + ")", field.<Element> getData(MetadataRepository.XSD_DOM_ELEMENT),
+                    field.<Integer> getData(MetadataRepository.XSD_LINE_NUMBER),
+                    field.<Integer> getData(MetadataRepository.XSD_COLUMN_NUMBER),
                     ValidationError.FOREIGN_KEY_SHOULD_POINT_TO_PRIMARY_KEY);
         }
         return true;

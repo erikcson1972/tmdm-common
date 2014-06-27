@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2013 Talend Inc. - www.talend.com
+ * Copyright (C) 2006-2014 Talend Inc. - www.talend.com
  *
  * This source code is available under agreement available at
  * %InstallDIR%\features\org.talend.rcp.branding.%PRODUCTNAME%\%PRODUCTNAME%license.txt
@@ -15,9 +15,8 @@ import org.talend.mdm.commmon.metadata.validation.CompositeValidationRule;
 import org.talend.mdm.commmon.metadata.validation.ValidationFactory;
 import org.talend.mdm.commmon.metadata.validation.ValidationRule;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
 
 /**
  *
@@ -47,13 +46,13 @@ public class ContainedTypeFieldMetadata extends MetadataExtensions implements Fi
     private int cachedHashCode;
 
     public ContainedTypeFieldMetadata(ComplexTypeMetadata containingType,
-                                      boolean isMany,
-                                      boolean isMandatory,
-                                      String name,
-                                      ComplexTypeMetadata fieldType,
-                                      List<String> allowWriteUsers,
-                                      List<String> hideUsers,
-                                      List<String> workflowAccessRights) {
+            boolean isMany,
+            boolean isMandatory,
+            String name,
+            ComplexTypeMetadata fieldType,
+            List<String> allowWriteUsers,
+            List<String> hideUsers,
+            List<String> workflowAccessRights) {
         if (fieldType == null) {
             throw new IllegalArgumentException("Contained type cannot be null.");
         }
@@ -143,7 +142,7 @@ public class ContainedTypeFieldMetadata extends MetadataExtensions implements Fi
     }
 
     public FieldMetadata copy() {
-        return new ContainedTypeFieldMetadata(containingType,
+        ContainedTypeFieldMetadata copy = new ContainedTypeFieldMetadata(containingType,
                 isMany,
                 isMandatory,
                 name,
@@ -151,6 +150,11 @@ public class ContainedTypeFieldMetadata extends MetadataExtensions implements Fi
                 allowWriteUsers,
                 hideUsers,
                 workflowAccessRights);
+        if (dataMap != null) {
+            copy.dataMap = new HashMap<String, Object>(dataMap);
+        }
+        copy.declaringType = this.declaringType;
+        return copy;
     }
 
     public List<String> getHideUsers() {

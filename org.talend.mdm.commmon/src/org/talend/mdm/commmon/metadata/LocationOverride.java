@@ -23,7 +23,7 @@ public class LocationOverride implements ValidationHandler {
 
     private final Integer column;
 
-    private FieldMetadata fieldMetadata;
+    private final FieldMetadata fieldMetadata;
 
     public LocationOverride(FieldMetadata fieldMetadata, ValidationHandler handler, Element xmlElement, Integer line, Integer column) {
         this.fieldMetadata = fieldMetadata;
