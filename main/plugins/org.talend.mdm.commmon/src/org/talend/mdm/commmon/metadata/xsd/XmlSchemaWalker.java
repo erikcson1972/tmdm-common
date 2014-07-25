@@ -21,7 +21,8 @@ import org.eclipse.xsd.XSDSimpleTypeDefinition;
 import org.eclipse.xsd.XSDTypeDefinition;
 
 /**
- * A 'walker' for the parsed XML schema (calls the right methods on {@link org.talend.mdm.commmon.metadata.xsd.XSDVisitor visitor}.
+ * A 'walker' for the parsed XML schema (calls the right methods on
+ * {@link org.talend.mdm.commmon.metadata.xsd.XSDVisitor visitor}.
  */
 public class XmlSchemaWalker {
 
@@ -57,9 +58,6 @@ public class XmlSchemaWalker {
 
     public static void walk(XSDElementDeclaration element, XSDVisitor visitor) {
         if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(element.getTargetNamespace())) {
-            return;
-        }
-        if (element.isElementDeclarationReference()) {
             return;
         }
         visitor.visitElement(element);
