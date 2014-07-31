@@ -31,7 +31,24 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.xsd.*;
+import org.eclipse.xsd.XSDAnnotation;
+import org.eclipse.xsd.XSDComplexTypeContent;
+import org.eclipse.xsd.XSDComplexTypeDefinition;
+import org.eclipse.xsd.XSDConstrainingFacet;
+import org.eclipse.xsd.XSDDiagnostic;
+import org.eclipse.xsd.XSDDiagnosticSeverity;
+import org.eclipse.xsd.XSDElementDeclaration;
+import org.eclipse.xsd.XSDEnumerationFacet;
+import org.eclipse.xsd.XSDIdentityConstraintDefinition;
+import org.eclipse.xsd.XSDLengthFacet;
+import org.eclipse.xsd.XSDMaxLengthFacet;
+import org.eclipse.xsd.XSDModelGroup;
+import org.eclipse.xsd.XSDParticle;
+import org.eclipse.xsd.XSDParticleContent;
+import org.eclipse.xsd.XSDSchema;
+import org.eclipse.xsd.XSDSimpleTypeDefinition;
+import org.eclipse.xsd.XSDTypeDefinition;
+import org.eclipse.xsd.XSDXPathDefinition;
 import org.eclipse.xsd.util.XSDParser;
 import org.talend.mdm.commmon.metadata.annotation.ForeignKeyProcessor;
 import org.talend.mdm.commmon.metadata.annotation.LabelAnnotationProcessor;
@@ -588,6 +605,10 @@ public class MetadataRepository implements MetadataVisitable, XSDVisitor, Serial
             FieldMetadata fieldMetadata;
             int minOccurs = ((XSDParticle) element.getContainer()).getMinOccurs();
             int maxOccurs = ((XSDParticle) element.getContainer()).getMaxOccurs();
+            if (element.isElementDeclarationReference()
+                    && currentTypeStack.peek().getName().equals(element.getResolvedElementDeclaration().getName())) {
+                return;
+            }
             if (element.getResolvedElementDeclaration() != null
                     && element.getResolvedElementDeclaration().getTargetNamespace() == null) {
                 fieldMetadata = createFieldMetadata(element.getResolvedElementDeclaration(), currentTypeStack.peek(), minOccurs,

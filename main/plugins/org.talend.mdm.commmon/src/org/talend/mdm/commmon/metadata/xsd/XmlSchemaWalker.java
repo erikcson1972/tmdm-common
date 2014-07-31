@@ -60,9 +60,6 @@ public class XmlSchemaWalker {
         if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(element.getTargetNamespace())) {
             return;
         }
-        if (element.isElementDeclarationReference()) {
-            return;
-        }
         visitor.visitElement(element);
     }
 
